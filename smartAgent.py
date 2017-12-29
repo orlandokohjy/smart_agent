@@ -86,10 +86,10 @@ def main():
 
 	# create titles for the csv
 	titles = ""
-	for key in keys:
-		titles = titles + key + ","
+	for i in range(len(keys)):
+		titles = titles + keys[i] + ","
 	titles = titles[:-1] # slice off the last comma
-	titles = titles + "/n"
+	titles = titles + "\n"
 	file.write(titles)
 	
 	for dob in DOB:
@@ -111,12 +111,14 @@ def main():
 								print("reading data ...")
 								for i in range(len(dic['ProdList']['Product'])):
 									writeString = ""
-									for key in keys:
-										if dic['ProdList']['Product'][i][key] != None \
-										and dic['ProdList']['Product'][i][key] != 'null':
-											writeString += dic['ProdList']['Product'][i][key] + ","
+									for j in range(len(keys)):
+										if dic['ProdList']['Product'][i][keys[j]] != None \
+											and dic['ProdList']['Product'][i][keys[j]] != 'null':
+											# !!! need to remove COMMA in the retrieved data !!!
+											writeString += dic['ProdList']['Product'][i][keys[j]].replace(",", "")
 										else:
-											writeString += "NA,"
+											writeString += "NA"
+										writeString += ","
 									writeString = writeString[:-1] # slice off the last comma
 									writeString += "\n"
 									file.write(writeString)
@@ -132,10 +134,10 @@ def main():
 	
 	# create titles for the csv
 	titles = ""
-	for key in keys:
-		titles = titles + key + ","
+	for i in range(len(keys)):
+		titles = titles + keys[i] + ","
 	titles = titles[:-1] # slice off the last comma
-	titles = titles + "/n"
+	titles = titles + "\n"
 	file.write(titles)
 
 	for dob in DOB:
@@ -157,10 +159,10 @@ def main():
 								print("reading data ...")
 								for i in range(len(dic['ProdList']['Product'])):
 									writeString = ""
-									for key in dic['ProdList']['Product'][i]:
-										if dic['ProdList']['Product'][i][key] != None \
-										and dic['ProdList']['Product'][i][key] != 'null':
-											writeString += dic['ProdList']['Product'][i][key] + ","
+									for i in range(len(keys)):
+										if dic['ProdList']['Product'][i][keys[i]] != None \
+										and dic['ProdList']['Product'][i][keys[i]] != 'null':
+											writeString += dic['ProdList']['Product'][i][keys[i]].replace(",", "") + ","
 										else:
 											writeString += "NA,"
 									writeString = writeString[:-1] # slice off the last comma
