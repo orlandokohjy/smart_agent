@@ -9,4 +9,5 @@ Web scrape insurance data from comparefirst.sg
 - Eg. python smartAgent.py 1970 2000
 
 ## Disclaimer
-- I'm in no way affliated with comparefirst.sg. Use at your own risk.
+- I'm in no way affliated with comparefirst.sg 
+- Use at your own risk
