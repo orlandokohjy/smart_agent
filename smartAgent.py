@@ -10,6 +10,7 @@ headers['content-type'] = 'application/x-www-form-urlencoded'
 headers['origin'] = 'http://comparefirst.sg'
 headers['Referer'] = 'http://comparefirst.sg/wap/homeEvent.action'
 
+# ----------------- This setting is for 'direct purchase' -----------------
 payload = "productGroup=invst&searchproduct=&prodGroup=bips&pageAction=search" \
 + "&breadCrumb=null&viewProdsId=null&ProdsCompIDs=null&ProdsVisibleIDs=null" \
 + "&subCatSeleJson=null&subCatCountJson=null&sortOrderSelected=null" \
@@ -78,9 +79,10 @@ keys = ['id', 'InsurerId', 'InsurerName', 'InsurerIcon', 'ProductId', 'ProductNa
  'ContactInsurer', 'LastUpdatedOn', 'Subtitle']
 
 def main():
+	errorLog = open("errorLog.txt", 'w')
+
 	# category = 'term-life':
 	file = open(selCategory[0] + ".csv", 'w')
-	errorLog = open("errorLog.txt", 'w')
 
 	# create titles for the csv
 	titles = ""
@@ -89,7 +91,7 @@ def main():
 	titles = titles[:-1] # slice off the last comma
 	titles = titles + "/n"
 	file.write(titles)
-
+	
 	for dob in DOB:
 		print("Downloading {0} data for {1}".format(selCategory[0],dob.replace("%2F", "/")))
 		for gender in selGender:
@@ -112,8 +114,9 @@ def main():
 									for key in keys:
 										if dic['ProdList']['Product'][i][key] != None \
 										and dic['ProdList']['Product'][i][key] != 'null':
-											writeString += dic['ProdList']['Product'][i][key]
-										writeString += "NA,"
+											writeString += dic['ProdList']['Product'][i][key] + ","
+										else:
+											writeString += "NA,"
 									writeString = writeString[:-1] # slice off the last comma
 									writeString += "\n"
 									file.write(writeString)
@@ -123,8 +126,18 @@ def main():
 								errorLog.write("Error for {0}, {1}, {2}, {3}, {4}, {5}, {6}\n".format( \
 									selCategory[0], dob, gender, smokeStatus, cib, coverageTerm, sumAssured))
 	file.close()
+	
 
 	file = open(selCategory[1] + ".csv", 'w')
+	
+	# create titles for the csv
+	titles = ""
+	for key in keys:
+		titles = titles + key + ","
+	titles = titles[:-1] # slice off the last comma
+	titles = titles + "/n"
+	file.write(titles)
+
 	for dob in DOB:
 		print("Downloading {0} data for {1}".format(selCategory[1],dob.replace("%2F", "/")))
 		for gender in selGender:
@@ -132,7 +145,7 @@ def main():
 				for cib in selCIRider:
 					for premiumTerm in premiumTermDcips:
 						for sumAssured in SAWLDCIPS:
-							formattedPayload = payload.format(selCategory[0], \
+							formattedPayload = payload.format(selCategory[1], \
 								gender, smokeStatus, dob, cib, "", \
 								"", premiumTerm, sumAssured)
 							r = requests.post(url, headers=headers, data=formattedPayload)
@@ -144,11 +157,12 @@ def main():
 								print("reading data ...")
 								for i in range(len(dic['ProdList']['Product'])):
 									writeString = ""
-									for key in keys:
+									for key in dic['ProdList']['Product'][i]:
 										if dic['ProdList']['Product'][i][key] != None \
 										and dic['ProdList']['Product'][i][key] != 'null':
-											writeString += dic['ProdList']['Product'][i][key]
-										writeString += "NA,"
+											writeString += dic['ProdList']['Product'][i][key] + ","
+										else:
+											writeString += "NA,"
 									writeString = writeString[:-1] # slice off the last comma
 									writeString += "\n"
 									file.write(writeString)
@@ -165,6 +179,8 @@ if __name__ == '__main__':
 	global startYear
 	# year > 2000 / age < 18 
 	# happen to be useless
+	# for whole-life
+	# year < 1980ish seem to be useless
 	global endYear
 	startYear = int(sys.argv[1])
 	endYear = int(sys.argv[2])
