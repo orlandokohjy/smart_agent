@@ -86,6 +86,7 @@ def main():
 
 	# create titles for the csv
 	titles = ""
+	titles += "DOB, Gender, Smoke Status, Critical Illness Benefits, Coverage Term, Sum Assured,"
 	for i in range(len(keys)):
 		titles = titles + keys[i] + ","
 	titles = titles[:-1] # slice off the last comma
@@ -93,7 +94,8 @@ def main():
 	file.write(titles)
 	
 	for dob in DOB:
-		print("Downloading {0} data for {1}".format(selCategory[0],dob.replace("%2F", "/")))
+		formattedDOB = dob.replace("%2F", "/")
+		print("Downloading {0} data for {1}".format(selCategory[0], formattedDOB))
 		for gender in selGender:
 			for smokeStatus in selSmokStatus:
 				for cib in selCIRider:
@@ -110,7 +112,8 @@ def main():
 							try:
 								print("reading data ...")
 								for i in range(len(dic['ProdList']['Product'])):
-									writeString = ""
+									writeString = "{0}, {1}, {2}, {3}, {4}, {5},".format( \
+										formattedDOB, gender, smokeStatus, cib, coverageTerm, sumAssured)
 									for j in range(len(keys)):
 										if dic['ProdList']['Product'][i][keys[j]] != None \
 											and dic['ProdList']['Product'][i][keys[j]] != 'null':
@@ -126,7 +129,7 @@ def main():
 								print(e)
 								errorLog.write(str(e))
 								errorLog.write("Error for {0}, {1}, {2}, {3}, {4}, {5}, {6}\n".format( \
-									selCategory[0], dob, gender, smokeStatus, cib, coverageTerm, sumAssured))
+									selCategory[0], formattedDOB, gender, smokeStatus, cib, coverageTerm, sumAssured))
 	file.close()
 	
 
@@ -150,19 +153,24 @@ def main():
 							formattedPayload = payload.format(selCategory[1], \
 								gender, smokeStatus, dob, cib, "", \
 								"", premiumTerm, sumAssured)
-							r = requests.post(url, headers=headers, data=formattedPayload)
-							bs = BeautifulSoup(r.text, 'html.parser')
-							xml = bs.find(id="prodStringXML")
-							xml = xml.get('value')
-							dic = xmltodict.parse(xml, xml_attribs=True)
+							while True:
+								try:	
+									r = requests.post(url, headers=headers, data=formattedPayload)
+									bs = BeautifulSoup(r.text, 'html.parser')
+									xml = bs.find(id="prodStringXML")
+									xml = xml.get('value')
+									dic = xmltodict.parse(xml, xml_attribs=True)
+									break
+								except Exception as e:
+									print(e)
 							try:
 								print("reading data ...")
 								for i in range(len(dic['ProdList']['Product'])):
 									writeString = ""
-									for i in range(len(keys)):
-										if dic['ProdList']['Product'][i][keys[i]] != None \
-										and dic['ProdList']['Product'][i][keys[i]] != 'null':
-											writeString += dic['ProdList']['Product'][i][keys[i]].replace(",", "") + ","
+									for j in range(len(keys)):
+										if dic['ProdList']['Product'][i][keys[j]] != None \
+										and dic['ProdList']['Product'][i][keys[j]] != 'null':
+											writeString += dic['ProdList']['Product'][i][keys[j]].replace(",", "") + ","
 										else:
 											writeString += "NA,"
 									writeString = writeString[:-1] # slice off the last comma
