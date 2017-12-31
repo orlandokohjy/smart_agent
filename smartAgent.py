@@ -137,6 +137,7 @@ def main():
 	
 	# create titles for the csv
 	titles = ""
+	titles += "DOB, Gender, Smoke Status, Critical Illness Benefits, Coverage Term, Sum Assured,"
 	for i in range(len(keys)):
 		titles = titles + keys[i] + ","
 	titles = titles[:-1] # slice off the last comma
@@ -144,7 +145,8 @@ def main():
 	file.write(titles)
 
 	for dob in DOB:
-		print("Downloading {0} data for {1}".format(selCategory[1],dob.replace("%2F", "/")))
+		formattedDOB = dob.replace("%2F", "/")
+		print("Downloading {0} data for {1}".format(selCategory[1], formattedDOB))
 		for gender in selGender:
 			for smokeStatus in selSmokStatus:
 				for cib in selCIRider:
@@ -166,7 +168,8 @@ def main():
 							try:
 								print("reading data ...")
 								for i in range(len(dic['ProdList']['Product'])):
-									writeString = ""
+									writeString = "{0}, {1}, {2}, {3}, {4}, {5},".format( \
+										formattedDOB, gender, smokeStatus, cib, coverageTerm, sumAssured)
 									for j in range(len(keys)):
 										if dic['ProdList']['Product'][i][keys[j]] != None \
 										and dic['ProdList']['Product'][i][keys[j]] != 'null':
@@ -180,7 +183,7 @@ def main():
 								print(e)
 								errorLog.write(str(e))
 								errorLog.write("Error for {0}, {1}, {2}, {3}, {4}, {5}, {6}".format( \
-									selCategory[1], dob, gender, smokeStatus, cib, premiumTerm, sumAssured))
+									selCategory[1], formattedDOB, gender, smokeStatus, cib, premiumTerm, sumAssured))
 	file.close()
 	errorLog.close()
 
