@@ -5,7 +5,7 @@ Web scrape insurance data from comparefirst.sg
 - Python 3 
 
 ## How to use
-- Execute the python file with starting year and ending year
+- Execute the python file with starting and ending year of birth
 - Eg. python smartAgent.py 1970 2000
 
 ## Disclaimer
